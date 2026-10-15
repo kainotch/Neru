@@ -1,0 +1,24 @@
+package com.notch.neru.core.data.model
+
+data class UserSettings(
+    val stopMediaPlayback: Boolean = true,
+    val fadeOutDurationSeconds: Int = 30,
+    val screenOff: Boolean = false,
+    val screenLockMethod: ScreenLockMethod = ScreenLockMethod.Default,
+    val turnOffWifi: Boolean = false,
+    val turnOffMobileData: Boolean = false,
+    val turnOffBluetooth: Boolean = false,
+    val hapticFeedbackEnabled: Boolean = true,
+    val theme: ThemeId = ThemeId.Default,
+    val starsEnabled: Boolean = true,
+    val autoRotateMode: AutoRotateMode = AutoRotateMode.Default,
+    val stepMinutes: Int = 5,
+    val presetMinutes: Int = 15,
+    val launchAnimationEnabled: Boolean = true,
+    val timerMode: TimerMode = TimerMode.Default,
+    val targetAllApps: Boolean = true,
+    val selectedTargetAppPackage: String? = null,
+    val selectedTargetAppName: String? = null,
+    val selectedTargetAppPackages: Set<String> = emptySet(),
+    val customTargetAppPackages: Set<String> = emptySet(),
+)

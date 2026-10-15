@@ -1,0 +1,526 @@
+package com.notch.neru.feature.timer.settings
+
+import android.app.Activity
+import android.app.admin.DevicePolicyManager
+import android.content.Intent
+import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Bluetooth
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.MusicOff
+import androidx.compose.material.icons.outlined.RocketLaunch
+import androidx.compose.material.icons.outlined.ScreenLockPortrait
+import androidx.compose.material.icons.outlined.ScreenRotation
+import androidx.compose.material.icons.outlined.SignalCellularAlt
+import androidx.compose.material.icons.outlined.Vibration
+import androidx.compose.material.icons.outlined.Wifi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.notch.neru.core.service.shizuku.ShizukuManager
+import com.notch.neru.core.data.model.AutoRotateMode
+import com.notch.neru.core.data.model.ScreenLockMethod
+import com.notch.neru.feature.timer.R
+import com.notch.neru.feature.timer.settings.components.AccessibilityRequiredDialog
+import com.notch.neru.feature.timer.settings.components.AutoRotateModeDialog
+import com.notch.neru.feature.timer.settings.components.FadeOutSlider
+import com.notch.neru.feature.timer.settings.components.ScreenLockMethodDialog
+import com.notch.neru.feature.timer.settings.components.labelRes
+import com.notch.neru.feature.timer.settings.components.SettingsToggleRow
+import com.notch.neru.feature.timer.settings.components.SettingsTopBar
+import com.notch.neru.feature.timer.settings.components.ShizukuRequiredDialog
+import com.notch.neru.feature.timer.settings.components.StepMinutesSlider
+import com.notch.neru.feature.timer.theme.AppThemes
+import com.notch.neru.feature.timer.theme.ProvideAppTheme
+import com.notch.neru.feature.timer.theme.appTheme
+import com.notch.neru.feature.timer.theme.rememberAnimatedAppTheme
+import com.notch.neru.feature.timer.timer.components.TimerBackground
+
+@Composable
+fun SettingsScreen(
+    onBack: () -> Unit,
+    onNavigateToAbout: () -> Unit,
+    highlightScreenOff: Boolean = false,
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val ready = uiState ?: return
+
+    val animatedTheme = rememberAnimatedAppTheme(AppThemes.byId(ready.settings.theme))
+    ProvideAppTheme(animatedTheme) {
+        SettingsContent(
+            uiState = ready,
+            onBack = onBack,
+            onNavigateToAbout = onNavigateToAbout,
+            viewModel = viewModel,
+            highlightScreenOff = highlightScreenOff,
+        )
+    }
+}
+
+@Composable
+private fun SettingsContent(
+    uiState: SettingsUiState,
+    onBack: () -> Unit,
+    onNavigateToAbout: () -> Unit,
+    viewModel: SettingsViewModel,
+    highlightScreenOff: Boolean = false,
+) {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val isHighlighted = highlightScreenOff && !uiState.settings.screenOff
+
+    LaunchedEffect(highlightScreenOff) {
+        if (highlightScreenOff) {
+            bringIntoViewRequester.bringIntoView()
+        }
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "screenOffPulse")
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.35f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(750, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "pulseAlpha",
+    )
+
+    val screenDescription = stringResource(R.string.screen_description)
+    val shizukuSoftScreenOffExplanation =
+        stringResource(R.string.shizuku_feature_soft_screen_off)
+    val shizukuWifiExplanation = stringResource(R.string.shizuku_feature_wifi)
+    val shizukuBluetoothExplanation = stringResource(R.string.shizuku_feature_bluetooth)
+    val shizukuMobileDataExplanation = stringResource(R.string.shizuku_feature_mobile_data)
+
+    val context = LocalContext.current
+
+    val deviceAdminLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            viewModel.updateScreenOff(true)
+            viewModel.updateScreenLockMethod(ScreenLockMethod.DeviceAdmin)
+        }
+    }
+
+    var shizukuDialogExplanation by remember { mutableStateOf<String?>(null) }
+    var pendingShizukuToggle by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var showMethodDialog by remember { mutableStateOf(false) }
+    var showAccessibilityDialog by remember { mutableStateOf(false) }
+    // Set when the user was sent to the accessibility settings to enable the lock
+    // service; resolved on ON_RESUME once we can re-query the grant.
+    var pendingAccessibilityEnable by remember { mutableStateOf(false) }
+    var showAutoRotateDialog by remember { mutableStateOf(false) }
+
+    fun requestWithShizuku(explanation: String, enableAction: () -> Unit) {
+        if (viewModel.isShizukuReady()) {
+            enableAction()
+        } else {
+            shizukuDialogExplanation = explanation
+            pendingShizukuToggle = enableAction
+        }
+    }
+
+    if (shizukuDialogExplanation != null) {
+        ShizukuRequiredDialog(
+            state = uiState.shizukuState,
+            featureExplanation = shizukuDialogExplanation!!,
+            onRequestPermission = { viewModel.requestShizukuPermission() },
+            onDismiss = {
+                shizukuDialogExplanation = null
+                pendingShizukuToggle = null
+            },
+        )
+    }
+
+    if (showMethodDialog) {
+        ScreenLockMethodDialog(
+            onDeviceAdminSelected = {
+                if (viewModel.isDeviceAdminActive()) {
+                    viewModel.updateScreenOff(true)
+                    viewModel.updateScreenLockMethod(ScreenLockMethod.DeviceAdmin)
+                } else {
+                    val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                        putExtra(
+                            DevicePolicyManager.EXTRA_DEVICE_ADMIN,
+                            viewModel.getAdminComponent(),
+                        )
+                        putExtra(
+                            DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                            screenDescription,
+                        )
+                    }
+                    deviceAdminLauncher.launch(intent)
+                }
+            },
+            onAccessibilitySelected = {
+                if (viewModel.isAccessibilityLockEnabled()) {
+                    viewModel.updateScreenOff(true)
+                    viewModel.updateScreenLockMethod(ScreenLockMethod.Accessibility)
+                } else {
+                    showAccessibilityDialog = true
+                }
+            },
+            onShizukuSelected = {
+                requestWithShizuku(shizukuSoftScreenOffExplanation) {
+                    viewModel.updateScreenOff(true)
+                    viewModel.updateScreenLockMethod(ScreenLockMethod.Shizuku)
+                }
+            },
+            onDismiss = { showMethodDialog = false },
+        )
+    }
+
+    if (showAccessibilityDialog) {
+        AccessibilityRequiredDialog(
+            onOpenSettings = {
+                // No activity result to wait for — the grant is re-checked on ON_RESUME.
+                pendingAccessibilityEnable = true
+                showAccessibilityDialog = false
+                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            },
+            onDismiss = { showAccessibilityDialog = false },
+        )
+    }
+
+    if (showAutoRotateDialog) {
+        AutoRotateModeDialog(
+            selected = uiState.settings.autoRotateMode,
+            onSelect = { viewModel.updateAutoRotateMode(it) },
+            onDismiss = { showAutoRotateDialog = false },
+        )
+    }
+
+    // Auto-complete the pending toggle if Shizuku transitions to Ready while dialog is open.
+    LaunchedEffect(uiState.shizukuState, pendingShizukuToggle) {
+        if (pendingShizukuToggle != null && uiState.shizukuState == ShizukuManager.State.Ready) {
+            pendingShizukuToggle?.invoke()
+            pendingShizukuToggle = null
+            shizukuDialogExplanation = null
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshShizuku()
+    }
+
+    // Device admin and the accessibility service can be revoked from system Settings
+    // without any broadcast we're subscribed to — re-query on resume so the "Screen"
+    // row description reflects the current state when the user comes back. This is
+    // also where a pending accessibility-method selection completes: if the user
+    // enabled the service while away, commit the choice they made in the dialog.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.refreshPermissionState()
+        if (pendingAccessibilityEnable) {
+            pendingAccessibilityEnable = false
+            if (viewModel.isAccessibilityLockEnabled()) {
+                viewModel.updateScreenOff(true)
+                viewModel.updateScreenLockMethod(ScreenLockMethod.Accessibility)
+            }
+        }
+    }
+
+    TimerBackground(
+        animating = false,
+        starsEnabled = uiState.settings.starsEnabled,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars),
+        ) {
+            SettingsTopBar(
+                title = stringResource(R.string.settings_title),
+                onBack = onBack,
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                SectionHeader(stringResource(R.string.category_appearance))
+                SettingsToggleRow(
+                    icon = Icons.Outlined.RocketLaunch,
+                    title = stringResource(R.string.launch_animation_title),
+                    description = stringResource(R.string.launch_animation_description),
+                    checked = uiState.settings.launchAnimationEnabled,
+                    onCheckedChange = { viewModel.updateLaunchAnimationEnabled(it) },
+                )
+                SettingsNavigationRow(
+                    icon = Icons.Outlined.ScreenRotation,
+                    title = stringResource(R.string.auto_rotate_title),
+                    description = stringResource(uiState.settings.autoRotateMode.labelRes),
+                    onClick = { showAutoRotateDialog = true },
+                )
+
+                SectionHeader(stringResource(R.string.category_sleep_timer))
+                SettingsToggleRow(
+                    icon = Icons.Outlined.MusicOff,
+                    title = stringResource(R.string.playback_title),
+                    description = stringResource(R.string.playback_description),
+                    checked = uiState.settings.stopMediaPlayback,
+                    onCheckedChange = { viewModel.updateStopMediaPlayback(it) },
+                )
+                FadeOutSlider(
+                    durationSeconds = uiState.settings.fadeOutDurationSeconds,
+                    onDurationChanged = { viewModel.updateFadeOutDuration(it) },
+                )
+                StepMinutesSlider(
+                    stepMinutes = uiState.settings.stepMinutes,
+                    onStepChanged = { viewModel.updateStepMinutes(it) },
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .bringIntoViewRequester(bringIntoViewRequester)
+                        .padding(horizontal = if (isHighlighted) 12.dp else 0.dp)
+                        .then(
+                            if (isHighlighted) {
+                                Modifier
+                                    .background(
+                                        Color(0xFF6C5CE7).copy(alpha = 0.14f * pulseAlpha),
+                                        RoundedCornerShape(16.dp),
+                                    )
+                                    .border(
+                                        BorderStroke(2.dp, Color(0xFFC9B8FF).copy(alpha = pulseAlpha)),
+                                        RoundedCornerShape(16.dp),
+                                    )
+                                    .padding(vertical = 4.dp)
+                            } else {
+                                Modifier
+                            }
+                        ),
+                ) {
+                    if (isHighlighted) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Info,
+                                contentDescription = null,
+                                tint = Color(0xFFC9B8FF),
+                                modifier = Modifier.size(16.dp),
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = stringResource(R.string.highlight_screen_off_hint),
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    color = Color(0xFFC9B8FF),
+                                    fontWeight = FontWeight.SemiBold,
+                                ),
+                            )
+                        }
+                    }
+
+                    SettingsToggleRow(
+                        icon = Icons.Outlined.ScreenLockPortrait,
+                        title = stringResource(R.string.screen_title),
+                        description = when {
+                            !uiState.settings.screenOff -> stringResource(R.string.screen_description)
+                            uiState.settings.screenLockMethod == ScreenLockMethod.Shizuku ->
+                                stringResource(R.string.screen_method_active_soft)
+                            uiState.isDeviceAdminActive -> stringResource(R.string.screen_method_active_hard)
+                            else -> stringResource(R.string.screen_method_hard_revoked)
+                        },
+                        checked = uiState.settings.screenOff,
+                        onCheckedChange = { enabled ->
+                            if (enabled) {
+                                showMethodDialog = true
+                            } else {
+                                viewModel.updateScreenOff(false)
+                            }
+                        },
+                    )
+                }
+
+                SettingsToggleRow(
+                    icon = Icons.Outlined.Wifi,
+                    title = stringResource(R.string.wifi_off_title),
+                    description = stringResource(R.string.wifi_off_description),
+                    checked = uiState.settings.turnOffWifi,
+                    onCheckedChange = { enabled ->
+                        if (enabled) {
+                            requestWithShizuku(shizukuWifiExplanation) {
+                                viewModel.updateTurnOffWifi(true)
+                            }
+                        } else {
+                            viewModel.updateTurnOffWifi(false)
+                        }
+                    },
+                )
+
+                SettingsToggleRow(
+                    icon = Icons.Outlined.Bluetooth,
+                    title = stringResource(R.string.bluetooth_off_title),
+                    description = stringResource(R.string.bluetooth_off_description),
+                    checked = uiState.settings.turnOffBluetooth,
+                    onCheckedChange = { enabled ->
+                        if (enabled) {
+                            requestWithShizuku(shizukuBluetoothExplanation) {
+                                viewModel.updateTurnOffBluetooth(true)
+                            }
+                        } else {
+                            viewModel.updateTurnOffBluetooth(false)
+                        }
+                    },
+                )
+
+                SettingsToggleRow(
+                    icon = Icons.Outlined.SignalCellularAlt,
+                    title = stringResource(R.string.mobile_data_off_title),
+                    description = stringResource(R.string.mobile_data_off_description),
+                    checked = uiState.settings.turnOffMobileData,
+                    onCheckedChange = { enabled ->
+                        if (enabled) {
+                            requestWithShizuku(shizukuMobileDataExplanation) {
+                                viewModel.updateTurnOffMobileData(true)
+                            }
+                        } else {
+                            viewModel.updateTurnOffMobileData(false)
+                        }
+                    },
+                )
+
+                SectionHeader(stringResource(R.string.category_haptic))
+                SettingsToggleRow(
+                    icon = Icons.Outlined.Vibration,
+                    title = stringResource(R.string.haptic_title),
+                    description = stringResource(R.string.haptic_description),
+                    checked = uiState.settings.hapticFeedbackEnabled,
+                    onCheckedChange = { viewModel.updateHapticFeedback(it) },
+                )
+
+                SectionHeader(stringResource(R.string.category_about))
+                SettingsNavigationRow(
+                    icon = Icons.Outlined.Info,
+                    title = stringResource(R.string.about_entry_title),
+                    description = stringResource(R.string.about_entry_description),
+                    onClick = onNavigateToAbout,
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SettingsNavigationRow(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    onClick: () -> Unit,
+) {
+    val theme = appTheme()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(horizontal = 20.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(theme.surface1),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp),
+            )
+        }
+        Spacer(modifier = Modifier.width(14.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = theme.textPrimary,
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = theme.textDim,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(text: String) {
+    val theme = appTheme()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 8.dp),
+        horizontalArrangement = Arrangement.Start,
+    ) {
+        Text(
+            text = text.uppercase(),
+            style = MaterialTheme.typography.labelLarge,
+            color = theme.textMuted,
+        )
+    }
+}

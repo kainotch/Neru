@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name">Schlaf-Timer</string>
+    <string name="notification_channel_description">Zeigt verbleibende Zeit des Schlaf-Timers</string>
+    <string name="notification_content_title">Schlaf-Timer</string>
+    <plurals name="notification_minutes_remaining">
+        <item quantity="one">Noch %d Minute</item>
+        <item quantity="other">Noch %d Minuten</item>
+    </plurals>
+    <string name="notification_less_than_minute">Weniger als eine Minute verbleibend</string>
+    <string name="notification_fading_out">Wiedergabe wird ausgeblendet</string>
+    <string name="notification_action_add_minutes">+%d Min</string>
+    <string name="notification_action_subtract_minutes">-%d Min</string>
+    <string name="notification_action_cancel">Abbrechen</string>
+    <string name="notification_inactivity_title">Inaktivitäts-Schlaftimer</string>
+    <plurals name="notification_inactivity_minutes_remaining">
+        <item quantity="one">Noch %d Min inaktiv • Reset wenn wach</item>
+        <item quantity="other">Noch %d Min inaktiv • Reset wenn wach</item>
+    </plurals>
+    <string name="notification_inactivity_less_than_minute">Weniger als 1 Min inaktiv • Reset wenn wach</string>
+    <string name="notification_inactivity_active">Aktiv • Timer zurückgesetzt</string>
+    <string name="timer_reset_we_heard_you">Timer zurückgesetzt — Aktivität erkannt!</string>
+    <string name="notification_checkin_title">Bist du noch wach?</string>
+    <string name="notification_checkin_text">Musik wird ausgeblendet • Tippen oder schütteln zum Fortsetzen</string>
+    <string name="notification_action_awake">Ich bin wach</string>
+    <string name="notification_action_stop_now">Jetzt schlafen</string>
+</resources>

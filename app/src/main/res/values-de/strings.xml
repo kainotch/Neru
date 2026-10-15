@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Neru</string>
+
+    <!-- Timer Screen -->
+    <string name="start_timer">Timer starten</string>
+    <string name="stop_timer">Timer stoppen</string>
+    <string name="settings">Einstellungen</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="category_sleep_timer">Sleep Timer</string>
+    <string name="playback_title">Wiedergabe</string>
+    <string name="playback_description">Medienwiedergabe stoppen</string>
+    <string name="fade_out_title">Fade-out-Dauer</string>
+    <string name="fade_out_seconds">%d Sekunden</string>
+    <string name="screen_title">Bildschirm</string>
+    <string name="screen_description">Display ausschalten (Shizuku optional)</string>
+    <string name="screen_admin_required">Geräteadministrator-Berechtigung erforderlich</string>
+    <string name="category_haptic">Haptisches Feedback</string>
+    <string name="haptic_title">Haptisches Feedback</string>
+    <string name="haptic_description">Vibrieren bei Verwendung von Timer und Bedienelementen</string>
+
+    <!-- Quick Settings tile (name and minutes reuse app_name / widget_minutes) -->
+    <string name="qs_tile_fading_out">Wird ausgeblendet</string>
+
+    <!-- Notification strings live in :core:service to keep them next to the consumer. -->
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Erforderlich, um den Bildschirm zu sperren, wenn der Schlaf-Timer endet.</string>
+
+    <!-- Accessibility lock service (shown in the system accessibility settings) -->
+    <string name="accessibility_service_label">Neru Bildschirmsperre</string>
+    <string name="accessibility_service_description">Wird nur verwendet, um den Bildschirm zu sperren, wenn der Schlaf-Timer endet. Neru liest oder beobachtet keine Bildschirminhalte.</string>
+
+    <!-- Home screen widget -->
+    <string name="widget_description">Startet den Schlaf-Timer mit nur einem Tipp.</string>
+    <string name="widget_minutes">%d Min</string>
+    <string name="widget_preview_minutes">15 Min</string>
+    <string name="widget_tap_to_start">Zum Starten tippen</string>
+    <string name="widget_tap_to_cancel">Zum Abbrechen tippen</string>
+    <string name="widget_fading_out">Wiedergabe wird ausgeblendet</string>
+</resources>

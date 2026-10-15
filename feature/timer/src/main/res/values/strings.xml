@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Neru</string>
+    <string name="start_timer">Start timer</string>
+    <string name="stop_timer">Stop timer</string>
+    <string name="settings">Settings</string>
+    <string name="cd_step_minus">Decrease time</string>
+    <string name="cd_step_plus">Increase time</string>
+
+    <!-- Time units shown under the dial -->
+    <string name="time_unit_minute">minute</string>
+    <string name="time_unit_minutes">minutes</string>
+    <string name="time_unit_hr_min">hr · min</string>
+    <string name="ends_at_time">Ends at %1$s</string>
+    <string name="mode_fixed">Fixed Timer</string>
+    <string name="mode_inactivity">Inactivity</string>
+    <string name="inactivity_resets_on_touch">Resets on scroll or touch</string>
+    <string name="inactivity_locks_after">Locks screen after %1$d minutes of idle time</string>
+    <string name="inactivity_active_status">Active • Locks after %1$d min idle</string>
+    <string name="inactivity_checkin_awake_prompt">Are you still awake? Tap or shake to extend</string>
+    <string name="fixed_locks_after">Locks screen after %1$d minutes</string>
+    <string name="screen_off_timer_title">neru ねる</string>
+    <string name="turn_off_music_title">Turn Off Music</string>
+    <string name="turn_off_music_desc">All media will be turned off</string>
+    <string name="lock_screen_title">Lock Screen</string>
+    <string name="lock_screen_desc">Automatically lock the device screen</string>
+    <string name="target_all_apps_title">All Apps</string>
+    <string name="target_all_apps_desc">Works on all apps</string>
+    <string name="target_app_running_status">Active in %1$s • Locks after %2$d min</string>
+    <string name="target_apps_two_status">Active in %1$s, %2$s • Locks after %3$d min</string>
+    <string name="target_apps_multiple_status">Active in %1$d apps • Locks after %2$d min</string>
+    <string name="target_app_paused_status">Paused • Open %1$s to resume</string>
+    <string name="target_apps_paused_multiple_status">Paused • Open a selected app to resume</string>
+    <string name="usage_access_dialog_title">Usage Access Required</string>
+    <string name="usage_access_dialog_desc">To track when selected apps are open on your screen and pause when closed, Neru needs Usage Access in Android Settings.</string>
+    <string name="usage_access_action_grant">Open Settings</string>
+    <string name="select_target_app_title">Select Apps</string>
+    <string name="select_other_app">+ More</string>
+    <string name="action_done">Done</string>
+    <string name="show_more_apps">More (%1$d)</string>
+    <string name="show_less_apps">Less</string>
+    <string name="min_sec_label">Min : Sec</string>
+    <string name="preset_min">min</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="category_appearance">Appearance</string>
+    <string name="stars_title">Stars background</string>
+    <string name="stars_description">Drifting starfield behind the dial</string>
+    <string name="launch_animation_title">Launch animation</string>
+    <string name="launch_animation_description">Rocket-style play button animation when starting the timer</string>
+    <string name="stars_unavailable">Not available on this theme</string>
+    <string name="auto_rotate_title">Auto-rotate</string>
+    <string name="auto_rotate_dialog_title">Choose rotation mode</string>
+    <string name="auto_rotate_system_title">System setting</string>
+    <string name="auto_rotate_system_description">Rotate only when system auto-rotate is on</string>
+    <string name="auto_rotate_always_title">Always</string>
+    <string name="auto_rotate_always_description">Rotate with the device, even if system rotation is locked</string>
+    <string name="auto_rotate_portrait_title">Portrait</string>
+    <string name="auto_rotate_portrait_description">Never rotate</string>
+    <string name="category_sleep_timer">Sleep Timer</string>
+    <string name="playback_title">Playback</string>
+    <string name="playback_description">Stop audio and video playback</string>
+    <string name="fade_out_title">Fade-out duration</string>
+    <string name="fade_out_seconds">%d seconds</string>
+    <string name="step_minutes_title">+/− step</string>
+    <string name="step_minutes_value">%d min</string>
+    <string name="screen_title">Screen</string>
+    <string name="screen_description">Lock screen when timer ends (Shizuku optional)</string>
+    <string name="highlight_screen_off_hint">Enable to turn off your screen when timer ends</string>
+    <string name="widget_config_title">Widget settings</string>
+    <string name="widget_config_description">Choose what a tap on this widget starts. Each widget can be configured individually.</string>
+    <string name="widget_config_save">Save</string>
+    <string name="widget_fixed_duration_title">Fixed duration</string>
+    <string name="widget_fixed_duration_off">This widget starts with the last used time</string>
+    <string name="widget_fixed_duration_on">This widget always starts with the duration below</string>
+
+    <string name="category_haptic">Haptic Feedback</string>
+    <string name="haptic_title">Haptic feedback</string>
+    <string name="haptic_description">Vibrate when using timer and controls</string>
+
+    <!-- Theme names -->
+    <string name="theme_midnight">Midnight</string>
+    <string name="theme_ocean">Ocean</string>
+    <string name="theme_ember">Ember</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_basic">Basic</string>
+    <string name="theme_amoled">AMOLED</string>
+
+    <!-- Shizuku dialog -->
+    <string name="shizuku_dialog_title">Shizuku required</string>
+    <string name="shizuku_body_not_installed">Shizuku is not installed. Tap below to learn how to install and set it up.</string>
+    <string name="shizuku_body_not_running">Shizuku is installed but not running. Open the Shizuku app and start the service.</string>
+    <string name="shizuku_body_permission">Neru needs permission to use Shizuku.</string>
+    <string name="shizuku_body_ready">Shizuku is ready.</string>
+    <string name="shizuku_action_install">Install guide</string>
+    <string name="shizuku_action_open">Open Shizuku</string>
+    <string name="shizuku_action_grant">Grant permission</string>
+    <string name="shizuku_action_ok">OK</string>
+    <string name="shizuku_action_cancel">Cancel</string>
+
+    <!-- Shizuku feature explanations (per-toggle) -->
+    <string name="shizuku_feature_soft_screen_off">Soft screen-off simulates a power-button press via Shizuku, so biometric unlock keeps working.</string>
+    <string name="shizuku_feature_wifi">Turning off Wi-Fi after the timer ends requires Shizuku because modern Android versions block apps from toggling Wi-Fi directly.</string>
+    <string name="shizuku_feature_bluetooth">Turning off Bluetooth after the timer ends requires Shizuku because modern Android versions block apps from toggling Bluetooth directly.</string>
+
+    <!-- Short feature labels used in the startup permission dialog's bullet list -->
+    <string name="shizuku_feature_label_display">Turn off display</string>
+    <string name="shizuku_feature_label_wifi">Turn off Wi-Fi</string>
+    <string name="shizuku_feature_label_bluetooth">Turn off Bluetooth</string>
+    <string name="shizuku_feature_label_mobile_data">Turn off mobile data</string>
+    <string name="shizuku_startup_intro">Shizuku permission is missing for the following enabled features:</string>
+
+    <!-- Device admin required dialog (startup) -->
+    <string name="admin_dialog_title">Device admin permission required</string>
+    <string name="admin_body_required">Device admin permission is missing. Without it Neru cannot lock the screen when the timer ends.</string>
+    <string name="admin_action_grant">Grant permission</string>
+
+    <!-- Generic dialog action used for startup permission warnings -->
+    <string name="dialog_action_ignore">Ignore</string>
+
+    <!-- Shizuku feature toggles -->
+    <string name="wifi_off_title">Turn off Wi-Fi</string>
+    <string name="wifi_off_description">Disable Wi-Fi when timer ends (requires Shizuku)</string>
+    <string name="bluetooth_off_title">Turn off Bluetooth</string>
+    <string name="bluetooth_off_description">Disable Bluetooth when timer ends (requires Shizuku)</string>
+    <string name="mobile_data_off_title">Turn off mobile data</string>
+    <string name="mobile_data_off_description">Disable mobile data when timer ends (requires Shizuku)</string>
+    <string name="shizuku_feature_mobile_data">Turning off mobile data after the timer ends requires Shizuku because Android blocks apps from toggling mobile data directly.</string>
+
+    <!-- Screen-lock method dialog -->
+    <string name="screen_method_dialog_title">Choose lock method</string>
+    <string name="screen_method_hard_title">Device admin</string>
+    <string name="screen_method_hard_description">Standard Android lock. Requires credential to unlock.</string>
+    <string name="screen_method_soft_title">Shizuku (soft)</string>
+    <string name="screen_method_soft_description">Simulates power button. Biometric unlock stays active.</string>
+    <string name="screen_method_accessibility_title">Accessibility (soft)</string>
+    <string name="screen_method_accessibility_description">Locks like the power button via an accessibility service. Biometric unlock stays active, no Shizuku needed.</string>
+    <string name="screen_method_active_hard">Turn off display - Device admin</string>
+    <string name="screen_method_active_soft">Turn off display - Shizuku</string>
+    <string name="screen_method_active_accessibility">Turn off display - Accessibility</string>
+    <string name="screen_method_hard_revoked">Turn off display - Device admin permission missing</string>
+    <string name="screen_method_accessibility_revoked">Turn off display - Accessibility service disabled</string>
+
+    <!-- Accessibility service required dialog -->
+    <string name="accessibility_dialog_title">Accessibility service required</string>
+    <string name="accessibility_body_required">To lock the screen this way, enable "Neru screen lock" in the system accessibility settings. Neru only uses it to lock the screen and does not read any screen content.</string>
+    <string name="accessibility_action_open_settings">Open settings</string>
+
+    <!-- About -->
+    <string name="category_about">About</string>
+    <string name="about_title">About</string>
+    <string name="about_entry_title">About this app</string>
+    <string name="about_entry_description">Version, source code and support</string>
+    <string name="about_version_title">Version</string>
+    <string name="about_author_title">Author</string>
+    <string name="about_author_value">kainotch</string>
+    <string name="about_github_title">GitHub</string>
+    <string name="about_github_value">github.com/kainotch</string>
+    <string name="about_instagram_title">Instagram</string>
+    <string name="about_instagram_value">@kainotch</string>
+    <string name="about_repo_title">Source code</string>
+    <string name="about_repo_value">github.com/kainotch/Neru</string>
+</resources>

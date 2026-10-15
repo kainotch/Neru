@@ -1,0 +1,48 @@
+package com.notch.neru.di
+
+import android.content.ComponentName
+import android.content.Context
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
+import com.notch.neru.core.service.TimerWidgetRefresher
+import com.notch.neru.core.service.screen.DeviceAdminComponent
+import com.notch.neru.feature.timer.widgetconfig.WidgetProviderComponent
+import com.notch.neru.receiver.SleepTimerDeviceAdminReceiver
+import com.notch.neru.widget.AppWidgetRefresher
+import com.notch.neru.widget.SleepTimerWidgetProvider
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+object AppModule {
+
+    /**
+     * Single source of truth for the device-admin receiver's ComponentName. The
+     * receiver class lives in this module, so lower modules must receive the
+     * component via injection instead of hard-coding the class name.
+     */
+    @Provides
+    @DeviceAdminComponent
+    fun provideDeviceAdminComponent(@ApplicationContext context: Context): ComponentName =
+        ComponentName(context, SleepTimerDeviceAdminReceiver::class.java)
+
+    /**
+     * Same pattern for the widget provider: the widget config screen in
+     * :feature:timer addresses the receiver through this binding.
+     */
+    @Provides
+    @WidgetProviderComponent
+    fun provideWidgetProviderComponent(@ApplicationContext context: Context): ComponentName =
+        ComponentName(context, SleepTimerWidgetProvider::class.java)
+
+    /**
+     * Lets :core:service push a terminal widget refresh without depending on the
+     * AppWidget provider (which lives here). See [TimerWidgetRefresher].
+     */
+    @Provides
+    @Singleton
+    fun provideTimerWidgetRefresher(impl: AppWidgetRefresher): TimerWidgetRefresher = impl
+}

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Neru</string>
+
+    <!-- Timer Screen -->
+    <string name="start_timer">Start timer</string>
+    <string name="stop_timer">Stop timer</string>
+    <string name="settings">Settings</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="category_sleep_timer">Sleep Timer</string>
+    <string name="playback_title">Playback</string>
+    <string name="playback_description">Stop audio and video playback</string>
+    <string name="fade_out_title">Fade-out duration</string>
+    <string name="fade_out_seconds">%d seconds</string>
+    <string name="screen_title">Screen</string>
+    <string name="screen_description">Lock screen when timer ends (Shizuku optional)</string>
+    <string name="screen_admin_required">Device admin permission required</string>
+    <string name="category_haptic">Haptic Feedback</string>
+    <string name="haptic_title">Haptic feedback</string>
+    <string name="haptic_description">Vibrate when using timer and controls</string>
+
+    <!-- Quick Settings tile (name and minutes reuse app_name / widget_minutes) -->
+    <string name="qs_tile_fading_out">Fading out</string>
+
+    <!-- Notification strings live in :core:service to keep them next to the consumer. -->
+
+    <!-- Device Admin -->
+    <string name="device_admin_description">Required to lock the screen when the sleep timer ends.</string>
+
+    <!-- Accessibility lock service (shown in the system accessibility settings) -->
+    <string name="accessibility_service_label">Neru screen lock</string>
+    <string name="accessibility_service_description">Used only to lock the screen when the sleep timer ends. Neru does not read or observe any screen content.</string>
+
+    <!-- Home screen widget -->
+    <string name="widget_description">Start the sleep timer with a single tap.</string>
+    <string name="widget_minutes">%d min</string>
+    <string name="widget_preview_minutes">15 min</string>
+    <string name="widget_tap_to_start">Tap to start</string>
+    <string name="widget_tap_to_cancel">Tap to cancel</string>
+    <string name="widget_fading_out">Fading out playback</string>
+</resources>

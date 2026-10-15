@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_name">Sleep Timer</string>
+    <string name="notification_channel_description">Shows remaining time for sleep timer</string>
+    <string name="notification_content_title">Sleep Timer</string>
+    <plurals name="notification_minutes_remaining">
+        <item quantity="one">%d minute remaining</item>
+        <item quantity="other">%d minutes remaining</item>
+    </plurals>
+    <string name="notification_less_than_minute">Less than a minute remaining</string>
+    <string name="notification_fading_out">Fading out playback</string>
+    <string name="notification_action_add_minutes">+%d min</string>
+    <string name="notification_action_subtract_minutes">-%d min</string>
+    <string name="notification_action_cancel">Cancel</string>
+    <string name="notification_inactivity_title">Inactivity Sleep Timer</string>
+    <plurals name="notification_inactivity_minutes_remaining">
+        <item quantity="one">%d min idle left • Resets if awake</item>
+        <item quantity="other">%d mins idle left • Resets if awake</item>
+    </plurals>
+    <string name="notification_inactivity_less_than_minute">Less than a min left • Resets if awake</string>
+    <string name="notification_inactivity_active">Active • Timer reset</string>
+    <string name="timer_reset_we_heard_you">Timer reset — we heard you!</string>
+    <string name="notification_checkin_title">Are you still awake?</string>
+    <string name="notification_checkin_text">Music fading out • Tap or shake to keep playing</string>
+    <string name="notification_action_awake">I\'m Awake</string>
+    <string name="notification_action_stop_now">Sleep Now</string>
+</resources>

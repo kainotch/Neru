@@ -1,0 +1,59 @@
+# Built application files
+*.apk
+*.aar
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Gradle & Build Cache
+.gradle/
+build/
+*/build/
+**/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log files
+*.log
+
+# Android Studio / IntelliJ IDEA
+*.iml
+.idea/
+.navigation/
+captures/
+/captures
+.externalNativeBuild
+.cxx
+
+# Keystores & Signing
+*.jks
+*.keystore
+secrets.properties
+
+# Python files & caches
+*.py
+*.pyc
+*.pyo
+__pycache__/
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Assistant/worktree caches
+.worktrees/
+.claude/
+
+# Keep gradle wrapper jar
+!gradle/wrapper/gradle-wrapper.jar
+

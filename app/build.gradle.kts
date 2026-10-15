@@ -1,0 +1,128 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.ksp)
+}
+
+// Schema: major * 100000 + minor * 1000 + patch * 10, derived from the axion-release tag
+// version so versionCode stays monotonic with already-published releases (v1.0.1 = 100010).
+// Axion only accepts SemVer tags (v<major>.<minor>.<patch>); a hotfix is the next patch tag.
+fun versionCodeFrom(version: String): Int {
+    val parts = version.substringBefore("-").split(".").map { it.toInt() }
+    require(parts.size == 3 && parts[1] <= 99 && parts[2] <= 99) {
+        "Cannot derive versionCode from version '$version'"
+    }
+    return parts[0] * 100_000 + parts[1] * 1_000 + parts[2] * 10
+}
+
+android {
+    namespace = "com.notch.neru"
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = "com.notch.neru"
+        minSdk = 26
+        targetSdk = 36
+        versionCode = 1
+        versionName = "0.0.1"
+    }
+
+    signingConfigs {
+        create("release") {
+            val storePath = System.getenv("SIGNING_KEYSTORE_PATH")
+            if (!storePath.isNullOrBlank() && file(storePath).exists()) {
+                storeFile = file(storePath)
+                storePassword = System.getenv("SIGNING_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
+            // F-Droid builds pass -PdisableSigning to emit an unsigned release APK it signs itself.
+            // Otherwise use release signing when SIGNING_KEYSTORE_PATH is provided (CI with secrets),
+            // and fall back to debug signing so local/CI builds without secrets still succeed.
+            signingConfig = when {
+                project.hasProperty("disableSigning") -> null
+                !System.getenv("SIGNING_KEYSTORE_PATH").isNullOrBlank() ->
+                    signingConfigs.getByName("release")
+                else -> signingConfigs.getByName("debug")
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    dependenciesInfo {
+        // AGP embeds a Play-encrypted dependency list in the APK signing block by default.
+        // F-Droid's scanner rejects that opaque blob ("extra signing block 'Dependency
+        // metadata'"), and nothing but Google Play can read it — drop it entirely.
+        includeInApk = false
+        includeInBundle = false
+    }
+
+    packaging {
+        jniLibs {
+            // Package the DataStore native libs as shipped in the dependency instead of
+            // letting AGP strip them — stripping is host-dependent (build machine's NDK),
+            // which breaks F-Droid's reproducible-build match against the release APK.
+            // The unstripped bytes come straight from the AAR, so every build agrees.
+            keepDebugSymbols += "**/*.so"
+        }
+    }
+
+    buildFeatures {
+        compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xannotation-default-target=param-property")
+    }
+}
+
+dependencies {
+    implementation(project(":core:data"))
+    implementation(project(":core:service"))
+    implementation(project(":feature:timer"))
+
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons.extended)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+
+    // shizuku-provider is declared in this module's AndroidManifest (<provider>),
+    // so the artifact must be directly visible on :app's compile classpath for lint
+    // to find the class. core:service only uses shizuku-api.
+    implementation(libs.shizuku.provider)
+}

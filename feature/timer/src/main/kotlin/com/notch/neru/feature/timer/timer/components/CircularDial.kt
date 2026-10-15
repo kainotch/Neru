@@ -1,0 +1,424 @@
+package com.notch.neru.feature.timer.timer.components
+
+import android.os.Build
+import android.view.HapticFeedbackConstants
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.unit.dp
+import com.notch.neru.core.data.model.MAX_TIMER_MINUTES
+import com.notch.neru.feature.timer.theme.AppTheme
+import com.notch.neru.feature.timer.theme.appTheme
+import kotlin.math.cos
+import kotlin.math.sin
+
+@Composable
+fun CircularDial(
+    state: CircularDialState,
+    isRunning: Boolean,
+    runningMinutes: Float,
+    hapticEnabled: Boolean,
+    onMinutesChanged: (Int) -> Unit,
+    onMinutesCommitted: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    // Lambda statt Float: der Wert wird erst im Draw-Pass gelesen, sodass jeder
+    // Impact-Frame nur den Canvas neu zeichnet statt den Dial zu recomposen.
+    impactPulse: () -> Float = { 0f },
+) {
+    val theme = appTheme()
+    val view = LocalView.current
+    val tickHapticType = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            HapticFeedbackConstants.SEGMENT_TICK
+        } else {
+            HapticFeedbackConstants.CLOCK_TICK
+        }
+    }
+    var lastReportedMinutes by remember { mutableStateOf(state.totalMinutes) }
+
+    // pointerInput(Unit) never restarts, so plain parameter captures inside the
+    // gesture lambdas freeze at the value they had when the pointer coroutine first
+    // launched. Read everything that changes over time through rememberUpdatedState.
+    val currentIsRunning by rememberUpdatedState(isRunning)
+    val currentRunningMinutes by rememberUpdatedState(runningMinutes)
+    val currentHapticEnabled by rememberUpdatedState(hapticEnabled)
+    val currentOnMinutesChanged by rememberUpdatedState(onMinutesChanged)
+    val currentOnMinutesCommitted by rememberUpdatedState(onMinutesCommitted)
+
+    val targetMinutes: Float = if (isRunning && !state.isDragging) {
+        runningMinutes
+    } else {
+        state.totalMinutes.toFloat()
+    }
+    val animatedMinutes = remember { Animatable(targetMinutes) }
+    LaunchedEffect(targetMinutes, state.isDragging) {
+        val diff = targetMinutes - animatedMinutes.value
+        val delta = kotlin.math.abs(diff)
+        val snap = state.isDragging || delta < 1f
+        if (snap) {
+            animatedMinutes.snapTo(targetMinutes)
+        } else {
+            // Cap the animated sweep at one revolution (60 minutes). On launch the
+            // Animatable starts at the 15-minute default while the persisted preset can
+            // be hours away; tweening the full distance in 360ms would spin the ring
+            // several times. Jump to one revolution short of the target first, so the
+            // ring never animates more than a single round.
+            if (delta > 60f) {
+                animatedMinutes.snapTo(targetMinutes - 60f * kotlin.math.sign(diff))
+            }
+            animatedMinutes.animateTo(
+                targetValue = targetMinutes,
+                animationSpec = tween(durationMillis = 360, easing = FastOutSlowInEasing),
+            )
+        }
+    }
+
+    val displayMinutes: Float = animatedMinutes.value
+    val minuteInRing = ((displayMinutes % 60f) + 60f) % 60f
+    val ringFraction = minuteInRing / 60f
+    val hoursComplete = (displayMinutes / 60f).toInt().coerceIn(0, state.maxRevolutions)
+
+    Box(
+        modifier = modifier.aspectRatio(1f),
+        contentAlignment = Alignment.Center,
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { offset ->
+                            // While running, dialState tracks the last idle preset, not
+                            // the ticking remaining time. Seed it to the currently-shown
+                            // minutes so the drag continues from the right position.
+                            if (currentIsRunning) {
+                                val seed = kotlin.math.ceil(currentRunningMinutes.coerceAtLeast(0f))
+                                    .toInt().coerceIn(1, MAX_TIMER_MINUTES)
+                                state.setMinutes(seed)
+                            }
+                            state.onDragStart(
+                                centerX = size.width / 2f,
+                                centerY = size.height / 2f,
+                                x = offset.x,
+                                y = offset.y,
+                            )
+                        },
+                        onDrag = { change, _ ->
+                            change.consume()
+                            state.onDrag(
+                                centerX = size.width / 2f,
+                                centerY = size.height / 2f,
+                                x = change.position.x,
+                                y = change.position.y,
+                            )
+                            if (state.totalMinutes != lastReportedMinutes) {
+                                if (currentHapticEnabled) {
+                                    view.performHapticFeedback(tickHapticType)
+                                }
+                                lastReportedMinutes = state.totalMinutes
+                                currentOnMinutesChanged(state.totalMinutes)
+                            }
+                        },
+                        onDragEnd = {
+                            state.onDragEnd()
+                            // Persist only at drag end to avoid DataStore write flood
+                            // during the gesture (30+ writes/sec otherwise).
+                            currentOnMinutesCommitted(state.totalMinutes)
+                        },
+                    )
+                },
+        ) {
+            val strokeWidth = 3.5.dp.toPx()
+            val radius = (size.minDimension - strokeWidth - 12.dp.toPx()) / 2f
+            val center = Offset(size.width / 2f, size.height / 2f)
+
+            // Subtle dark background ring
+            drawCircle(
+                color = Color(0xFF222630),
+                radius = radius,
+                center = center,
+                style = Stroke(width = strokeWidth),
+            )
+
+            if (displayMinutes > 0f) {
+                drawProgressArc(
+                    center = center,
+                    radius = radius,
+                    strokeWidth = strokeWidth,
+                    fraction = ringFraction,
+                    overflowing = displayMinutes >= 60f,
+                    trailColor = Color.White,
+                    leadColor = Color(0xFFE2F3FB),
+                )
+            }
+
+            val pulse = impactPulse()
+            if (pulse > 0f) {
+                drawImpactEffects(
+                    center = center,
+                    ringRadius = radius,
+                    strokeWidth = strokeWidth,
+                    pulse = pulse.coerceIn(0f, 1f),
+                    accent = Color.White,
+                )
+            }
+        }
+    }
+}
+
+private fun DrawScope.drawTicks(center: Offset, radius: Float, strokeWidth: Float, theme: AppTheme) {
+    if (theme.dialTickMajor.alpha == 0f && theme.dialTickMinor.alpha == 0f) return
+    for (i in 0 until 60) {
+        val big = i % 5 == 0
+        val angle = (i / 60f) * (2f * Math.PI.toFloat()) - (Math.PI.toFloat() / 2f)
+        val inner = radius - strokeWidth * 0.5f - (if (big) 10.dp.toPx() else 6.dp.toPx())
+        val outer = radius - strokeWidth * 0.5f - 3.dp.toPx()
+        val x1 = center.x + inner * cos(angle)
+        val y1 = center.y + inner * sin(angle)
+        val x2 = center.x + outer * cos(angle)
+        val y2 = center.y + outer * sin(angle)
+        drawLine(
+            color = if (big) theme.dialTickMajor else theme.dialTickMinor,
+            start = Offset(x1, y1),
+            end = Offset(x2, y2),
+            strokeWidth = if (big) 1.5.dp.toPx() else 1.dp.toPx(),
+            cap = StrokeCap.Round,
+        )
+    }
+}
+
+private fun DrawScope.drawProgressArc(
+    center: Offset,
+    radius: Float,
+    strokeWidth: Float,
+    fraction: Float,
+    overflowing: Boolean,
+    trailColor: Color,
+    leadColor: Color,
+) {
+    val topLeft = Offset(center.x - radius, center.y - radius)
+    val arcSize = Size(radius * 2, radius * 2)
+    val glowStrokeWidth = strokeWidth + 5.dp.toPx()
+    val radToDeg = 180f / Math.PI.toFloat()
+    val mainCapDeg = (strokeWidth * 0.5f) / radius * radToDeg
+
+    val sweep = if (overflowing) 360f else 360f * fraction.coerceIn(0f, 1f)
+    // Rotate the canvas so that the sweep gradient's 0° axis (east in the rotated frame)
+    // aligns with the arc's start angle in the original frame — top when partial, handle
+    // position when the ring has wrapped past 60 minutes.
+    val rotationDegrees = if (overflowing) -90f + fraction * 360f else -90f
+    val leadStop = if (overflowing) 1f else sweep / 360f
+
+    // Main arc: inset by one cap on each side so the round caps land flush with the visible
+    // span — starts exactly at top, ends exactly at handle.
+    val mainStartOffset = if (overflowing) 0f else mainCapDeg
+    val mainSweep = if (overflowing) 360f else (sweep - 2f * mainCapDeg).coerceAtLeast(0f)
+
+    // The sweep gradient's stops determine color at every angle around the full circle,
+    // including outside the arc's visible range. Without a snap-back, round caps extending
+    // past the last stop sample the lead color (Android clamps to last stop), which paints
+    // a bright blob where we expect a faded halo. Adding a quick trail-colored stop just
+    // past `leadStop` keeps the glow's rounded extension soft.
+    val snapStop = (leadStop + 0.001f).coerceAtMost(0.999f)
+    val trailFaded = trailColor.copy(alpha = 0.2f)
+    val leadFaded = leadColor.copy(alpha = 0.35f)
+
+    val mainBrush = if (overflowing) {
+        Brush.sweepGradient(
+            0f to trailColor,
+            1f to leadColor,
+            center = center,
+        )
+    } else {
+        Brush.sweepGradient(
+            0f to trailColor,
+            leadStop to leadColor,
+            snapStop to trailColor,
+            1f to trailColor,
+            center = center,
+        )
+    }
+    val glowBrush = if (overflowing) {
+        Brush.sweepGradient(
+            0f to trailFaded,
+            1f to leadFaded,
+            center = center,
+        )
+    } else {
+        Brush.sweepGradient(
+            0f to trailFaded,
+            leadStop to leadFaded,
+            snapStop to trailFaded,
+            1f to trailFaded,
+            center = center,
+        )
+    }
+
+    // Glow shares the main arc's geometric start/sweep — only the stroke is wider. The
+    // round cap then overhangs each end by the same radial amount it overhangs the sides,
+    // so the shadow halo reads as uniform thickness all the way around.
+    val glowStartOffset = mainStartOffset
+    val glowSweep = mainSweep
+
+    rotate(degrees = rotationDegrees, pivot = center) {
+        if (glowSweep > 0f) {
+            drawArc(
+                brush = glowBrush,
+                startAngle = glowStartOffset,
+                sweepAngle = glowSweep,
+                useCenter = false,
+                topLeft = topLeft,
+                size = arcSize,
+                style = Stroke(width = glowStrokeWidth, cap = StrokeCap.Round),
+            )
+        }
+        if (mainSweep > 0f) {
+            drawArc(
+                brush = mainBrush,
+                startAngle = mainStartOffset,
+                sweepAngle = mainSweep,
+                useCenter = false,
+                topLeft = topLeft,
+                size = arcSize,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+            )
+        }
+    }
+}
+
+private fun DrawScope.drawHourDots(
+    center: Offset,
+    radius: Float,
+    hoursComplete: Int,
+    totalDots: Int,
+    theme: AppTheme,
+) {
+    if (theme.hourDotInactive.alpha == 0f) return
+    val rDot = radius - 42.dp.toPx()
+    for (i in 0 until totalDots) {
+        val active = i < hoursComplete
+        val angle = (i / totalDots.toFloat()) * (2f * Math.PI.toFloat()) - (Math.PI.toFloat() / 2f)
+        val x = center.x + rDot * cos(angle)
+        val y = center.y + rDot * sin(angle)
+        drawCircle(
+            color = if (active) theme.accent else theme.hourDotInactive,
+            radius = if (active) 3.dp.toPx() else 2.dp.toPx(),
+            center = Offset(x, y),
+        )
+    }
+}
+
+private fun DrawScope.drawKnob(
+    center: Offset,
+    radius: Float,
+    fraction: Float,
+    theme: AppTheme,
+    dimmed: Boolean,
+) {
+    val angle = fraction * (2f * Math.PI.toFloat()) - (Math.PI.toFloat() / 2f)
+    val kx = center.x + radius * cos(angle)
+    val ky = center.y + radius * sin(angle)
+
+    val alpha = if (dimmed) 0.6f else 1f
+    drawCircle(
+        color = theme.accent.copy(alpha = alpha),
+        radius = 12.dp.toPx(),
+        center = Offset(kx, ky),
+    )
+    drawCircle(
+        color = theme.dialTrack,
+        radius = 5.dp.toPx(),
+        center = Offset(kx, ky),
+    )
+}
+
+private fun DrawScope.drawImpactEffects(
+    center: Offset,
+    ringRadius: Float,
+    strokeWidth: Float,
+    pulse: Float,
+    accent: Color,
+) {
+    // 1) Weißer Flash-„Bang" vom Dial-Zentrum — kurz, hell, weitet sich auf ~80dp.
+    // 1:1 nach Prototyp `impactFlash`: r 6dp → 80dp, opacity 0.95 → 0.
+    val bangProgress = (pulse / 0.63f).coerceIn(0f, 1f) // expansion completes at ~380ms of 600ms
+    val bangRadius = 6.dp.toPx() + (80.dp.toPx() - 6.dp.toPx()) * bangProgress
+    val bangAlpha = (1f - bangProgress).coerceAtLeast(0f) * 0.95f
+    if (bangAlpha > 0f) {
+        drawCircle(
+            brush = Brush.radialGradient(
+                0f to Color.White.copy(alpha = bangAlpha),
+                0.5f to Color.White.copy(alpha = bangAlpha * 0.45f),
+                1f to Color.White.copy(alpha = 0f),
+                center = center,
+                radius = bangRadius,
+            ),
+            radius = bangRadius,
+            center = center,
+        )
+    }
+
+    // 2) Drei Shockwave-Ringe, die vom Progress-Ring nach außen schwappen — wie
+    // wenn der Ring selbst Energie abgibt. 1:1 nach Prototyp: r 130 → 210 (= +62%
+    // über ringRadius), Stroke schrumpft von ~8 auf ~0.5dp während der Expansion.
+    // Offsets ~0ms/110ms/220ms bei 600ms Impact.
+    val rippleStart = ringRadius
+    val rippleEnd = ringRadius + 32.dp.toPx()
+    val rippleStrokeStart = 8.dp.toPx()
+    val rippleStrokeEnd = 0.5f.dp.toPx()
+    for (offset in IMPACT_RIPPLE_OFFSETS) {
+        val local = ((pulse - offset) / (1f - offset)).coerceIn(0f, 1f)
+        if (local <= 0f) continue
+        val rippleRadius = rippleStart + (rippleEnd - rippleStart) * local
+        val rippleStroke = rippleStrokeStart + (rippleStrokeEnd - rippleStrokeStart) * local
+        val rippleAlpha = (1f - local) * 0.9f
+        drawCircle(
+            color = accent.copy(alpha = rippleAlpha),
+            radius = rippleRadius,
+            center = center,
+            style = Stroke(width = rippleStroke),
+        )
+    }
+
+    // 3) Ring-Glow-Boost: das Outer-Glow-Feld um den Progress-Ring intensiviert
+    // sich kurz („igniting"-Phase). Schneller Anstieg, langsames Ausklingen.
+    val boostAlpha = when {
+        pulse < 0.12f -> pulse / 0.12f
+        else -> (1f - pulse) / 0.88f
+    }.coerceIn(0f, 1f) * 0.5f
+    if (boostAlpha > 0f) {
+        drawCircle(
+            color = accent.copy(alpha = boostAlpha),
+            radius = ringRadius,
+            center = center,
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round),
+        )
+    }
+}
+
+// Ripple-Offsets entsprechen ~0ms / 110ms / 220ms bei 600ms Impact (wie im Prototyp).
+private val IMPACT_RIPPLE_OFFSETS = floatArrayOf(0f, 0.18f, 0.37f)

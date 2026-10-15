@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Neru</string>
+    <string name="start_timer">Timer starten</string>
+    <string name="stop_timer">Timer stoppen</string>
+    <string name="settings">Einstellungen</string>
+    <string name="cd_step_minus">Zeit verringern</string>
+    <string name="cd_step_plus">Zeit erhöhen</string>
+
+    <!-- Time units shown under the dial -->
+    <string name="time_unit_minute">minute</string>
+    <string name="time_unit_minutes">minuten</string>
+    <string name="time_unit_hr_min">std · min</string>
+    <string name="ends_at_time">Endet um %1$s</string>
+    <string name="mode_fixed">Fester Timer</string>
+    <string name="mode_inactivity">Inaktivität</string>
+    <string name="inactivity_resets_on_touch">Setzt bei Berührung zurück</string>
+    <string name="inactivity_locks_after">Sperrt nach %1$d Min Inaktivität</string>
+    <string name="inactivity_active_status">Aktiv • Sperrt nach %1$d Min Inaktivität</string>
+    <string name="inactivity_checkin_awake_prompt">Bist du noch wach? Tippen oder schütteln</string>
+    <string name="screen_off_timer_title">Screen Off Timer</string>
+    <string name="turn_off_music_title">Musik ausschalten</string>
+    <string name="turn_off_music_desc">Alle Medien werden gestoppt</string>
+    <string name="lock_screen_title">Bildschirm sperren</string>
+    <string name="lock_screen_desc">Gerätebildschirm automatisch sperren</string>
+    <string name="target_all_apps_title">Alle Apps</string>
+    <string name="target_all_apps_desc">Gilt für alle Apps</string>
+    <string name="target_app_running_status">Aktiv in %1$s • Sperrt nach %2$d Min</string>
+    <string name="target_apps_two_status">Aktiv in %1$s, %2$s • Sperrt nach %3$d Min</string>
+    <string name="target_apps_multiple_status">Aktiv in %1$d Apps • Sperrt nach %2$d Min</string>
+    <string name="target_app_paused_status">Pausiert • Öffne %1$s zum Fortsetzen</string>
+    <string name="target_apps_paused_multiple_status">Pausiert • Öffne eine ausgewählte App zum Fortsetzen</string>
+    <string name="usage_access_dialog_title">Nutzungszugriff erforderlich</string>
+    <string name="usage_access_dialog_desc">Um zu erkennen, wann ausgewählte Apps aktiv sind, benötigt Neru Nutzungszugriff in den Android-Einstellungen.</string>
+    <string name="usage_access_action_grant">Einstellungen öffnen</string>
+    <string name="select_target_app_title">Apps auswählen</string>
+    <string name="select_other_app">+ Mehr</string>
+    <string name="action_done">Fertig</string>
+    <string name="show_more_apps">Mehr (%1$d)</string>
+    <string name="show_less_apps">Weniger</string>
+    <string name="min_sec_label">Min : Sek</string>
+    <string name="preset_min">Min</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="category_appearance">Erscheinungsbild</string>
+    <string name="stars_title">Sternen-Hintergrund</string>
+    <string name="stars_description">Driftendes Sternenfeld hinter dem Dial</string>
+    <string name="launch_animation_title">Launch-Animation</string>
+    <string name="launch_animation_description">Raketenartige Animation des Play-Buttons beim Timer-Start</string>
+    <string name="stars_unavailable">Für dieses Theme nicht verfügbar</string>
+    <string name="auto_rotate_title">Automatisch drehen</string>
+    <string name="auto_rotate_dialog_title">Drehverhalten wählen</string>
+    <string name="auto_rotate_system_title">Systemeinstellung</string>
+    <string name="auto_rotate_system_description">Dreht nur, wenn die Bildschirmdrehung im System aktiviert ist</string>
+    <string name="auto_rotate_always_title">Immer</string>
+    <string name="auto_rotate_always_description">Dreht mit dem Gerät, auch wenn die Drehung im System gesperrt ist</string>
+    <string name="auto_rotate_portrait_title">Hochformat</string>
+    <string name="auto_rotate_portrait_description">Nie drehen</string>
+    <string name="category_sleep_timer">Sleep Timer</string>
+    <string name="playback_title">Wiedergabe</string>
+    <string name="playback_description">Medienwiedergabe stoppen</string>
+    <string name="fade_out_title">Fade-out-Dauer</string>
+    <string name="fade_out_seconds">%d Sekunden</string>
+    <string name="step_minutes_title">+/− Schrittweite</string>
+    <string name="step_minutes_value">%d Min</string>
+    <string name="screen_title">Bildschirm</string>
+    <string name="screen_description">Display ausschalten (Shizuku optional)</string>
+    <string name="highlight_screen_off_hint">Aktivieren, um das Gerät bei Timer-Ablauf zu sperren</string>
+    <string name="widget_config_title">Widget-Einstellungen</string>
+    <string name="widget_config_description">Wähle, womit ein Tipp auf dieses Widget startet. Jedes Widget kann einzeln konfiguriert werden.</string>
+    <string name="widget_config_save">Speichern</string>
+    <string name="widget_fixed_duration_title">Feste Dauer</string>
+    <string name="widget_fixed_duration_off">Dieses Widget startet mit der zuletzt verwendeten Zeit</string>
+    <string name="widget_fixed_duration_on">Dieses Widget startet immer mit der unten eingestellten Dauer</string>
+
+    <string name="category_haptic">Haptisches Feedback</string>
+    <string name="haptic_title">Haptisches Feedback</string>
+    <string name="haptic_description">Vibrieren bei Verwendung von Timer und Bedienelementen</string>
+
+    <!-- Theme names -->
+    <string name="theme_midnight">Mitternacht</string>
+    <string name="theme_ocean">Ozean</string>
+    <string name="theme_ember">Glut</string>
+    <string name="theme_light">Hell</string>
+    <string name="theme_basic">Einfach</string>
+    <string name="theme_amoled">AMOLED</string>
+
+    <!-- Shizuku Dialog -->
+    <string name="shizuku_dialog_title">Shizuku erforderlich</string>
+    <string name="shizuku_body_not_installed">Shizuku ist nicht installiert. Tippe auf „Anleitung öffnen“, um zu Installations- und Einrichtungsinfos zu gelangen.</string>
+    <string name="shizuku_body_not_running">Shizuku ist installiert, aber nicht aktiv. Öffne die Shizuku-App und starte den Dienst.</string>
+    <string name="shizuku_body_permission">Neru benötigt die Berechtigung, Shizuku zu verwenden.</string>
+    <string name="shizuku_body_ready">Shizuku ist bereit.</string>
+    <string name="shizuku_action_install">Anleitung öffnen</string>
+    <string name="shizuku_action_open">Shizuku öffnen</string>
+    <string name="shizuku_action_grant">Berechtigung erteilen</string>
+    <string name="shizuku_action_ok">OK</string>
+    <string name="shizuku_action_cancel">Abbrechen</string>
+
+    <!-- Shizuku-Feature-Erklärungen (pro Schalter) -->
+    <string name="shizuku_feature_soft_screen_off">Sanftes Bildschirmabschalten simuliert einen Druck der Power-Taste via Shizuku, sodass die biometrische Entsperrung weiterhin funktioniert.</string>
+    <string name="shizuku_feature_wifi">WLAN nach Timer-Ende auszuschalten erfordert Shizuku, da moderne Android-Versionen Apps das direkte Umschalten von WLAN verbieten.</string>
+    <string name="shizuku_feature_bluetooth">Bluetooth nach Timer-Ende auszuschalten erfordert Shizuku, da moderne Android-Versionen Apps das direkte Umschalten von Bluetooth verbieten.</string>
+
+    <!-- Kurzbezeichnungen für die Bullet-Liste im Startup-Dialog -->
+    <string name="shizuku_feature_label_display">Display ausschalten</string>
+    <string name="shizuku_feature_label_wifi">WLAN ausschalten</string>
+    <string name="shizuku_feature_label_bluetooth">Bluetooth ausschalten</string>
+    <string name="shizuku_feature_label_mobile_data">Mobile Daten ausschalten</string>
+    <string name="shizuku_startup_intro">Die Shizuku-Berechtigung fehlt für folgende aktivierte Funktionen:</string>
+
+    <!-- Geräteadministrator-Dialog (beim Start) -->
+    <string name="admin_dialog_title">Geräteadministrator-Berechtigung erforderlich</string>
+    <string name="admin_body_required">Die Geräteadministrator-Berechtigung fehlt. Ohne sie kann Neru den Bildschirm nicht sperren, wenn der Timer endet.</string>
+    <string name="admin_action_grant">Berechtigung erteilen</string>
+
+    <!-- Generischer Dialog-Action für Startup-Berechtigungswarnungen -->
+    <string name="dialog_action_ignore">Ignorieren</string>
+
+    <!-- Shizuku-Funktionen -->
+    <string name="wifi_off_title">WLAN ausschalten</string>
+    <string name="wifi_off_description">WLAN deaktivieren (Shizuku benötigt)</string>
+    <string name="bluetooth_off_title">Bluetooth ausschalten</string>
+    <string name="bluetooth_off_description">Bluetooth deaktivieren (Shizuku benötigt)</string>
+    <string name="mobile_data_off_title">Mobile Daten ausschalten</string>
+    <string name="mobile_data_off_description">Mobile Daten bei Timer-Ende deaktivieren (Shizuku benötigt)</string>
+    <string name="shizuku_feature_mobile_data">Mobile Daten nach Timer-Ende auszuschalten erfordert Shizuku, da Android Apps das direkte Umschalten mobiler Daten verbietet.</string>
+
+    <!-- Sperrmethoden-Dialog -->
+    <string name="screen_method_dialog_title">Sperrmethode wählen</string>
+    <string name="screen_method_hard_title">Geräteadministrator</string>
+    <string name="screen_method_hard_description">Standard-Android-Sperre. Code zum Entsperren nötig.</string>
+    <string name="screen_method_soft_title">Shizuku (sanft)</string>
+    <string name="screen_method_soft_description">Simuliert Power-Taste. Biometrische Entsperrung bleibt aktiv.</string>
+    <string name="screen_method_accessibility_title">Bedienungshilfe (sanft)</string>
+    <string name="screen_method_accessibility_description">Sperrt wie die Power-Taste über einen Bedienungshilfen-Dienst. Biometrische Entsperrung bleibt aktiv, kein Shizuku nötig.</string>
+    <string name="screen_method_active_hard">Display ausschalten - Geräteadministrator</string>
+    <string name="screen_method_active_soft">Display ausschalten - Shizuku</string>
+    <string name="screen_method_active_accessibility">Display ausschalten - Bedienungshilfe</string>
+    <string name="screen_method_hard_revoked">Display ausschalten - Geräteadministrator-Berechtigung fehlt</string>
+    <string name="screen_method_accessibility_revoked">Display ausschalten - Bedienungshilfen-Dienst deaktiviert</string>
+
+    <!-- Bedienungshilfen-Dialog -->
+    <string name="accessibility_dialog_title">Bedienungshilfen-Dienst erforderlich</string>
+    <string name="accessibility_body_required">Um den Bildschirm auf diese Weise zu sperren, aktiviere „Neru Bildschirmsperre“ in den Bedienungshilfen-Einstellungen. Neru nutzt den Dienst nur zum Sperren des Bildschirms und liest keine Bildschirminhalte.</string>
+    <string name="accessibility_action_open_settings">Einstellungen öffnen</string>
+
+    <!-- Über die App -->
+    <string name="category_about">Über</string>
+    <string name="about_title">Über</string>
+    <string name="about_entry_title">Über diese App</string>
+    <string name="about_entry_description">Version, Quellcode und Unterstützung</string>
+    <string name="about_version_title">Version</string>
+    <string name="about_author_title">Autor</string>
+    <string name="about_author_value">kainotch</string>
+    <string name="about_github_title">GitHub</string>
+    <string name="about_github_value">github.com/kainotch</string>
+    <string name="about_instagram_title">Instagram</string>
+    <string name="about_instagram_value">@kainotch</string>
+    <string name="about_repo_title">Quellcode</string>
+    <string name="about_repo_value">github.com/kainotch/Neru</string>
+</resources>
